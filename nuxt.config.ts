@@ -15,7 +15,9 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxt/eslint',
-    '@nuxt/image',
+    ['@nuxt/image', { override: true }],
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error Vuetify is not typed

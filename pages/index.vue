@@ -55,12 +55,16 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
 
 const userName = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 const fakeStore = useFakeStore()
+const authStore = useAuthStore()
+const router = useRouter()
 
 const passwordFieldType = computed(() => {
   return showPassword.value ? 'text' : 'password'
@@ -81,7 +85,10 @@ const handleLogin = async () => {
       username: userName.value,
       password: password.value
     })
-    console.log('Login exitoso:', response)
+
+    authStore.setToken(response.token)
+
+    router.push('/users')
   } catch (error) {
     console.error('Error en el login:', error)
   } finally {

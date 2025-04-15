@@ -71,7 +71,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
+const router = useRouter()
 const userName = ref('Usuario')
 
 const menuItems = [
@@ -89,11 +93,9 @@ const handleUserMenuClick = (action: string) => {
     case 'profile':
       // Navegar al perfil
       break
-    case 'settings':
-      // Navegar a configuración
-      break
     case 'logout':
-      // Manejar cierre de sesión
+      authStore.logout()
+      router.push('/')
       break
   }
 }
