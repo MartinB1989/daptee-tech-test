@@ -8,9 +8,9 @@
           <v-card-text>
             <v-form @submit.prevent="handleLogin">
               <v-text-field
-                v-model="email"
-                label="Correo electrónico"
-                prepend-inner-icon="mdi-email"
+                v-model="userName"
+                label="Nombre de usuario"
+                prepend-inner-icon="mdi-account"
                 variant="outlined"
                 class="mb-4"
               />
@@ -30,6 +30,8 @@
                 block
                 type="submit"
                 class="mt-4"
+                :loading="loading"
+                :disabled="loading"
               >
                 Iniciar sesión
               </v-btn>
@@ -52,10 +54,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useFakeStore } from '~/composables/useFakeStore'
 
-const email = ref('')
+const userName = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const loading = ref(false)
+const fakeStore = useFakeStore()
 
 const passwordFieldType = computed(() => {
   return showPassword.value ? 'text' : 'password'
@@ -69,9 +74,19 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
 }
 
-const handleLogin = () => {
-  // Aquí iría la lógica de autenticación
-  console.log('Login attempt:', { email: email.value, password: password.value })
+const handleLogin = async () => {
+  try {
+    loading.value = true
+    const response = await fakeStore.login({
+      username: userName.value,
+      password: password.value
+    })
+    console.log('Login exitoso:', response)
+  } catch (error) {
+    console.error('Error en el login:', error)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
