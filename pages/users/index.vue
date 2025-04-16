@@ -4,7 +4,7 @@
       <v-card-title>Lista de Usuarios</v-card-title>
       <v-data-table
         :headers="headers"
-        :items="users"
+        :items="filteredUsers"
         :items-per-page="5"
         :loading="loading"
         loading-text="Cargando usuarios..."
@@ -51,9 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
+import { useSearchStore } from '~/stores/search'
 import type { User } from '~/types/User'
 
 definePageMeta({
@@ -64,6 +65,7 @@ const loading = ref(true)
 const users = ref<User[]>([])
 const fakeStore = useFakeStore()
 const alertStore = useAlertStore()
+const searchStore = useSearchStore()
 
 const headers = [
   { title: 'Nombre', key: 'name.firstname' },
@@ -79,6 +81,32 @@ const showUserModal = ref(false)
 const selectedUser = ref<User | null>(null)
 const showDeleteModal = ref(false)
 const userToDelete = ref<User | null>(null)
+
+// Filtrar usuarios según el término de búsqueda
+const filteredUsers = computed(() => {
+  if (!searchStore.searchQuery) {
+    return users.value
+  }
+
+  const searchTerm = searchStore.searchQuery.toLowerCase()
+  return users.value.filter(user => {
+    return (
+      user.username.toLowerCase().includes(searchTerm) || 
+      user.email.toLowerCase().includes(searchTerm) || 
+      user.name.firstname.toLowerCase().includes(searchTerm) || 
+      user.name.lastname.toLowerCase().includes(searchTerm)
+    )
+  })
+})
+
+// Limpiar búsqueda al desmontar el componente
+onMounted(() => {
+  fetchUsers()
+})
+
+watch(() => searchStore.searchQuery, (newVal) => {
+  console.log('Buscando usuarios por:', newVal)
+})
 
 const fetchUsers = async () => {
   loading.value = true
@@ -96,10 +124,6 @@ const fetchUsers = async () => {
     loading.value = false
   }
 }
-
-onMounted(() => {
-  fetchUsers()
-})
 
 const viewUser = (user: User) => {
   selectedUser.value = user

@@ -4,7 +4,7 @@
       <v-card-title>Lista de Productos</v-card-title>
       <v-data-table
         :headers="headers"
-        :items="products"
+        :items="filteredProducts"
         :items-per-page="5"
         :loading="loading"
         loading-text="Cargando productos..."
@@ -51,9 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
+import { useSearchStore } from '~/stores/search'
 import type { Product } from '~/types/Product'
 
 definePageMeta({
@@ -64,6 +65,7 @@ const loading = ref(true)
 const products = ref<Product[]>([])
 const fakeStore = useFakeStore()
 const alertStore = useAlertStore()
+const searchStore = useSearchStore()
 
 const headers = [
   { title: 'ID', key: 'id' },
@@ -78,6 +80,23 @@ const showProductModal = ref(false)
 const selectedProduct = ref<Product | null>(null)
 const showDeleteModal = ref(false)
 const productToDelete = ref<Product | null>(null)
+
+// Filtrar productos según el término de búsqueda
+const filteredProducts = computed(() => {
+  if (!searchStore.searchQuery) {
+    return products.value
+  }
+
+  const searchTerm = searchStore.searchQuery.toLowerCase()
+  return products.value.filter(product => 
+    product.title.toLowerCase().includes(searchTerm)
+  )
+})
+
+// Monitorear cambios en la búsqueda
+watch(() => searchStore.searchQuery, (newVal) => {
+  console.log('Buscando productos por:', newVal)
+})
 
 const fetchProducts = async () => {
   loading.value = true

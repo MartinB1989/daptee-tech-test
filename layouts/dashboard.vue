@@ -28,14 +28,18 @@
       <v-spacer/>
 
       <v-text-field
+        v-if="searchStore.currentModule"
+        v-model="searchStore.searchQuery"
         density="compact"
         variant="solo"
-        label="Buscar"
+        :label="searchStore.searchPlaceholder"
         prepend-inner-icon="mdi-magnify"
         single-line
         hide-details
         class="mx-4"
         style="max-width: 400px;"
+        clearable
+        @click:clear="searchStore.resetSearch"
       />
 
       <v-menu>
@@ -86,10 +90,12 @@
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alert'
+import { useSearchStore } from '~/stores/search'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const alertStore = useAlertStore()
+const searchStore = useSearchStore()
 const router = useRouter()
 const userName = ref('Usuario')
 
