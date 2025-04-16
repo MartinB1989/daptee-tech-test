@@ -16,7 +16,6 @@
               <v-icon
                 v-bind="props"
                 color="primary"
-                @click="openMenu(item)"
               >
                 mdi-dots-vertical
               </v-icon>
@@ -51,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
@@ -91,11 +90,6 @@ const filteredProducts = computed(() => {
   return products.value.filter(product => 
     product.title.toLowerCase().includes(searchTerm)
   )
-})
-
-// Monitorear cambios en la búsqueda
-watch(() => searchStore.searchQuery, (newVal) => {
-  console.log('Buscando productos por:', newVal)
 })
 
 const fetchProducts = async () => {
@@ -155,9 +149,6 @@ const confirmDelete = async () => {
   }
 }
 
-const openMenu = (item: Product) => {
-  console.log('Menú abierto para:', item)
-}
 </script>
 
 <style scoped>

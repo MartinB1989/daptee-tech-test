@@ -16,7 +16,6 @@
               <v-icon
                 v-bind="props"
                 color="primary"
-                @click="openMenu(item)"
               >
                 mdi-dots-vertical
               </v-icon>
@@ -51,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
@@ -102,10 +101,6 @@ const filteredUsers = computed(() => {
 // Limpiar búsqueda al desmontar el componente
 onMounted(() => {
   fetchUsers()
-})
-
-watch(() => searchStore.searchQuery, (newVal) => {
-  console.log('Buscando usuarios por:', newVal)
 })
 
 const fetchUsers = async () => {
@@ -159,10 +154,6 @@ const confirmDelete = async () => {
     showDeleteModal.value = false
     userToDelete.value = null
   }
-}
-
-const openMenu = (item: User) => {
-  console.log('Menú abierto para:', item)
 }
 </script>
 
