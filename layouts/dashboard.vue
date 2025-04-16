@@ -1,8 +1,12 @@
 <template>
   <v-app>
     <v-navigation-drawer
-      permanent
+      v-model="drawer"
+      :rail="!mdAndUp"
+      :permanent="mdAndUp"
+      :temporary="!mdAndUp"
       width="250"
+      color="primary"
     >
       <div class="d-flex justify-center pa-4">
         <v-img
@@ -25,6 +29,11 @@
     </v-navigation-drawer>
 
     <v-app-bar scroll-behavior="elevate">
+      <v-app-bar-nav-icon
+        v-if="!mdAndUp"
+        @click="drawer = !drawer"
+      />
+
       <v-spacer/>
 
       <v-text-field
@@ -37,7 +46,7 @@
         single-line
         hide-details
         class="mx-4"
-        style="max-width: 400px;"
+        :style="{ 'max-width': mdAndUp ? '400px' : '200px' }"
         clearable
         @click:clear="searchStore.resetSearch"
       />
@@ -46,9 +55,11 @@
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
-            prepend-icon="mdi-account-circle"
+            :prepend-icon="mdAndUp ? 'mdi-account-circle' : undefined"
+            :icon="!mdAndUp"
           >
-            {{ userName }}
+            <v-icon v-if="!mdAndUp">mdi-account-circle</v-icon>
+            <span v-if="mdAndUp">{{ userName }}</span>
           </v-btn>
         </template>
 
@@ -87,17 +98,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 const authStore = useAuthStore()
 const alertStore = useAlertStore()
 const searchStore = useSearchStore()
 const router = useRouter()
 const userName = ref('Usuario')
+const drawer = ref(false)
+
+const { mdAndUp } = useDisplay()
+
+// Inicializamos drawer basado en el tamaño de pantalla
+onMounted(() => {
+  drawer.value = mdAndUp.value
+})
+
+// Actualizamos drawer cuando cambia el tamaño de pantalla
+watch(mdAndUp, (newValue) => {
+  if (newValue) {
+    drawer.value = true
+  }
+})
 
 const menuItems = [
   { title: 'Usuarios', icon: 'mdi-account-group', to: '/users' },
