@@ -5,15 +5,31 @@
         <slot />
       </v-container>
     </v-main>
+
+    <v-alert
+      v-model="alertStore.show"
+      :type="alertStore.type"
+      :timeout="alertStore.timeout"
+      :location="alertStore.location"
+      position="absolute"
+      class="ma-4"
+      closable
+      @update:model-value="alertStore.hideAlert"
+    >
+      {{ alertStore.message }}
+    </v-alert>
   </v-app>
 </template>
 
 <script setup lang="ts">
-// No se requiere lógica adicional para este layout básico
+import { useAlertStore } from '~/stores/alert'
+
+const alertStore = useAlertStore()
 </script>
 
 <style scoped>
 .v-main {
   min-height: 100vh;
 }
+
 </style> 

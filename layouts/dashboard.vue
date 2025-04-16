@@ -66,15 +66,30 @@
         <slot />
       </v-container>
     </v-main>
+
+    <v-alert
+      v-model="alertStore.show"
+      :type="alertStore.type"
+      :timeout="alertStore.timeout"
+      :location="alertStore.location"
+      position="absolute"
+      class="ma-4"
+      closable
+      @update:model-value="alertStore.hideAlert"
+    >
+      {{ alertStore.message }}
+    </v-alert>
   </v-app>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
+import { useAlertStore } from '~/stores/alert'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const alertStore = useAlertStore()
 const router = useRouter()
 const userName = ref('Usuario')
 
@@ -102,5 +117,11 @@ const handleUserMenuClick = (action: string) => {
 </script>
 
 <style scoped>
-
+.alert-global {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
 </style>

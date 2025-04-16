@@ -56,6 +56,7 @@
 import { ref, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAuthStore } from '~/stores/auth'
+import { useAlertStore } from '~/stores/alert'
 import { useRouter } from 'vue-router'
 
 const userName = ref('')
@@ -64,6 +65,7 @@ const showPassword = ref(false)
 const loading = ref(false)
 const fakeStore = useFakeStore()
 const authStore = useAuthStore()
+const alertStore = useAlertStore()
 const router = useRouter()
 
 const passwordFieldType = computed(() => {
@@ -87,10 +89,11 @@ const handleLogin = async () => {
     })
 
     authStore.setToken(response.token)
-
+    alertStore.showAlert('¡Bienvenido! Has iniciado sesión correctamente', 'success')
     router.push('/users')
   } catch (error) {
     console.error('Error en el login:', error)
+    alertStore.showAlert('Error al iniciar sesión. Por favor, verifica tus credenciales', 'error')
   } finally {
     loading.value = false
   }
