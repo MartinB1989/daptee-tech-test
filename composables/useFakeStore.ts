@@ -26,9 +26,17 @@ export const useFakeStore = () => {
   const getUsers = () => {
     return $fetch<User[]>(`${baseUrl}/users`)
   }
+  // El endpoint de deleteUser existe en la API pero no elimina el usuario, solo devuelve un mensaje de éxito
+  // Por lo cual la eliminacion se realiza en el frontend pero al recargar la pagina se ven todos los usuarios nuevamente
+  const deleteUser = (userId: number) => {
+    return $fetch(`${baseUrl}/users/${userId}`, {
+      method: 'DELETE'
+    })
+  }
 
   return {
     login,
-    getUsers
+    getUsers,
+    deleteUser
   }
 } 

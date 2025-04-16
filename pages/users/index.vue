@@ -38,6 +38,11 @@
       v-model="showUserModal"
       :user="selectedUser"
     />
+
+    <ConfirmDeleteModal
+      v-model="showDeleteModal"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
@@ -68,6 +73,8 @@ const headers = [
 
 const showUserModal = ref(false)
 const selectedUser = ref<User | null>(null)
+const showDeleteModal = ref(false)
+const userToDelete = ref<User | null>(null)
 
 const fetchUsers = async () => {
   loading.value = true
@@ -96,7 +103,34 @@ const viewUser = (user: User) => {
 }
 
 const deleteUser = (user: User) => {
-  console.log('Eliminar usuario:', user)
+  userToDelete.value = user
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!userToDelete.value) return
+
+  try {
+    await fakeStore.deleteUser(userToDelete.value.id)
+    users.value = users.value.filter(u => u.id !== userToDelete.value?.id)
+    alertStore.showAlert(
+      'Usuario eliminado correctamente',
+      'success',
+      3000,
+      'right bottom'
+    )
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error)
+    alertStore.showAlert(
+      'Error al eliminar el usuario. Por favor, intente nuevamente más tarde.',
+      'error',
+      5000,
+      'right bottom'
+    )
+  } finally {
+    showDeleteModal.value = false
+    userToDelete.value = null
+  }
 }
 
 const openMenu = (item: User) => {
