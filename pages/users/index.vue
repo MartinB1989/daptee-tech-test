@@ -33,6 +33,11 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <UserDetailsModal
+      v-model="showUserModal"
+      :user="selectedUser"
+    />
   </div>
 </template>
 
@@ -40,32 +45,11 @@
 import { ref, onMounted } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
+import type { User } from '~/types/User'
 
 definePageMeta({
   layout: 'dashboard'
 })
-
-interface User {
-  id: number
-  email: string
-  username: string
-  password: string
-  name: {
-    firstname: string
-    lastname: string
-  }
-  phone: string
-  address: {
-    geolocation: {
-      lat: string
-      long: string
-    }
-    city: string
-    street: string
-    number: number
-    zipcode: string
-  }
-}
 
 const loading = ref(true)
 const users = ref<User[]>([])
@@ -81,6 +65,9 @@ const headers = [
   { title: 'Ciudad', key: 'address.city' },
   { title: 'Acciones', key: 'actions', sortable: false }
 ]
+
+const showUserModal = ref(false)
+const selectedUser = ref<User | null>(null)
 
 const fetchUsers = async () => {
   loading.value = true
@@ -104,7 +91,8 @@ onMounted(() => {
 })
 
 const viewUser = (user: User) => {
-  console.log('Ver usuario:', user)
+  selectedUser.value = user
+  showUserModal.value = true
 }
 
 const deleteUser = (user: User) => {
