@@ -1,4 +1,5 @@
 import type { User } from '~/types/User'
+import type { Product } from '~/types/Product'
 
 interface LoginCredentials {
   username: string
@@ -26,8 +27,19 @@ export const useFakeStore = () => {
   const getUsers = () => {
     return $fetch<User[]>(`${baseUrl}/users`)
   }
-  // El endpoint de deleteUser existe en la API pero no elimina el usuario, solo devuelve un mensaje de éxito
-  // Por lo cual la eliminacion se realiza en el frontend pero al recargar la pagina se ven todos los usuarios nuevamente
+
+  const getProducts = () => {
+    return $fetch<Product[]>(`${baseUrl}/products`)
+  }
+
+  // Los endpoints de deleteUser y deleteProduct existen en la API pero no eliminan el usuario o producto, solo devuelven un mensaje de éxito
+  // Por lo cual la eliminacion se realiza en el frontend pero al recargar la pagina se ven todos los usuarios o productos nuevamente
+  const deleteProduct = (productId: number) => {
+    return $fetch(`${baseUrl}/products/${productId}`, {
+      method: 'DELETE'
+    })
+  }
+
   const deleteUser = (userId: number) => {
     return $fetch(`${baseUrl}/users/${userId}`, {
       method: 'DELETE'
@@ -37,6 +49,8 @@ export const useFakeStore = () => {
   return {
     login,
     getUsers,
+    getProducts,
+    deleteProduct,
     deleteUser
   }
 } 

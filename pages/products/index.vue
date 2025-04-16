@@ -33,80 +33,67 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <ProductDetailsModal
+      v-model="showProductModal"
+      :product="selectedProduct"
+    />
+
+    <ConfirmDeleteModal
+      v-model="showDeleteModal"
+      title="Confirmar Eliminación"
+      message="¿Está seguro que desea eliminar este producto?"
+      cancel-text="Cancelar"
+      confirm-text="Confirmar"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useFakeStore } from '~/composables/useFakeStore'
+import { useAlertStore } from '~/stores/alert'
+import type { Product } from '~/types/Product'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
-interface Product {
-  name: string
-  category: string
-  price: number
-  stock: number
-  description: string
-}
-
 const loading = ref(true)
 const products = ref<Product[]>([])
+const fakeStore = useFakeStore()
+const alertStore = useAlertStore()
 
 const headers = [
-  { title: 'Nombre', key: 'name' },
-  { title: 'Categoría', key: 'category' },
+  { title: 'ID', key: 'id' },
+  { title: 'Título', key: 'title' },
   { title: 'Precio', key: 'price' },
-  { title: 'Stock', key: 'stock' },
-  { title: 'Descripción', key: 'description' },
+  { title: 'Categoría', key: 'category' },
+  { title: 'Stock', key: 'rating.count' },
   { title: 'Acciones', key: 'actions', sortable: false }
 ]
 
-const mockProducts: Product[] = [
-  {
-    name: 'Laptop HP',
-    category: 'Electrónicos',
-    price: 899.99,
-    stock: 15,
-    description: 'Laptop HP con procesador i7'
-  },
-  {
-    name: 'Smartphone Samsung',
-    category: 'Electrónicos',
-    price: 699.99,
-    stock: 25,
-    description: 'Smartphone Samsung Galaxy S21'
-  },
-  {
-    name: 'Monitor LG',
-    category: 'Electrónicos',
-    price: 299.99,
-    stock: 10,
-    description: 'Monitor LG 27 pulgadas'
-  },
-  {
-    name: 'Teclado Mecánico',
-    category: 'Periféricos',
-    price: 89.99,
-    stock: 30,
-    description: 'Teclado mecánico RGB'
-  },
-  {
-    name: 'Mouse Gaming',
-    category: 'Periféricos',
-    price: 49.99,
-    stock: 20,
-    description: 'Mouse gaming con 6 botones'
-  }
-]
+const showProductModal = ref(false)
+const selectedProduct = ref<Product | null>(null)
+const showDeleteModal = ref(false)
+const productToDelete = ref<Product | null>(null)
 
-const fetchProducts = () => {
+const fetchProducts = async () => {
   loading.value = true
-  setTimeout(() => {
-    products.value = mockProducts
+  try {
+    products.value = await fakeStore.getProducts()
+  } catch (error) {
+    console.error('Error al cargar productos:', error)
+    alertStore.showAlert(
+      'Error al cargar los productos. Por favor, intente nuevamente más tarde.',
+      'error',
+      5000,
+      'right bottom'
+    )
+  } finally {
     loading.value = false
-  }, 1500)
+  }
 }
 
 onMounted(() => {
@@ -114,11 +101,39 @@ onMounted(() => {
 })
 
 const viewProduct = (product: Product) => {
-  console.log('Ver producto:', product)
+  selectedProduct.value = product
+  showProductModal.value = true
 }
 
 const deleteProduct = (product: Product) => {
-  console.log('Eliminar producto:', product)
+  productToDelete.value = product
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!productToDelete.value) return
+
+  try {
+    await fakeStore.deleteProduct(productToDelete.value.id)
+    products.value = products.value.filter(p => p.id !== productToDelete.value?.id)
+    alertStore.showAlert(
+      'Producto eliminado correctamente',
+      'success',
+      3000,
+      'right bottom'
+    )
+  } catch (error) {
+    console.error('Error al eliminar producto:', error)
+    alertStore.showAlert(
+      'Error al eliminar el producto. Por favor, intente nuevamente más tarde.',
+      'error',
+      5000,
+      'right bottom'
+    )
+  } finally {
+    showDeleteModal.value = false
+    productToDelete.value = null
+  }
 }
 
 const openMenu = (item: Product) => {

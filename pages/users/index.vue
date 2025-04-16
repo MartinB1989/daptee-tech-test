@@ -41,6 +41,10 @@
 
     <ConfirmDeleteModal
       v-model="showDeleteModal"
+      title="Confirmar Eliminación"
+      message="¿Está seguro que desea eliminar este usuario?"
+      cancel-text="Cancelar"
+      confirm-text="Confirmar"
       @confirm="confirmDelete"
     />
   </div>
