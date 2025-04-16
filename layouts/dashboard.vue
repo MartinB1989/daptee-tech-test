@@ -8,7 +8,7 @@
       width="250"
       color="primary"
     >
-      <div class="d-flex justify-center pa-4">
+      <div class="d-flex justify-center pa-4 bg-white">
         <v-img
           src="/logo-daptee.svg"
         />
@@ -46,7 +46,7 @@
         single-line
         hide-details
         class="mx-4"
-        :style="{ 'max-width': mdAndUp ? '400px' : '200px' }"
+        :class="{ 'search-responsive': !mdAndUp }"
         clearable
         @click:clear="searchStore.resetSearch"
       />
@@ -57,14 +57,14 @@
         class="mr-2"
       >
         <v-icon>{{ getCurrentThemeIcon() }}</v-icon>
-        
+
         <v-menu
           activator="parent"
           location="bottom"
         >
           <v-list>
             <v-list-subheader>Seleccionar Tema</v-list-subheader>
-            
+
             <v-list-item
               v-for="(theme, index) in availableThemes"
               :key="index"
@@ -73,7 +73,7 @@
               @click="themeStore.setTheme(theme.value)"
             >
               <template #append>
-                <v-icon 
+                <v-icon
                   v-if="themeStore.currentTheme === theme.value"
                   color="primary"
                   icon="mdi-check"
@@ -190,14 +190,14 @@ const menuItems = [
 ]
 
 const userMenuItems = [
-  { title: 'Perfil', icon: 'mdi-account', action: 'profile' },
+  { title: 'Mi Cuenta', icon: 'mdi-account', action: 'profile' },
   { title: 'Cerrar sesión', icon: 'mdi-logout', action: 'logout' },
 ]
 
 const handleUserMenuClick = (action: string) => {
   switch (action) {
     case 'profile':
-      // Navegar al perfil
+      router.push('/profile')
       break
     case 'logout':
       authStore.logout()
@@ -214,5 +214,17 @@ const handleUserMenuClick = (action: string) => {
   right: 20px;
   z-index: 1000;
   max-width: 400px;
+}
+
+.search-responsive {
+  width: 100%;
+  max-width: 100% !important;
+}
+
+@media (max-width: 600px) {
+  .mx-4.search-responsive {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
 }
 </style>

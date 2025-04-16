@@ -2,7 +2,7 @@ import { useAuthStore } from '~/stores/auth'
 
 export default defineNuxtRouteMiddleware((to) => {
   const authStore = useAuthStore()
-  const isAuthenticated = authStore.isAuthenticated // Usa el getter que ya tienes
+  const isAuthenticated = authStore.isAuthenticated
 
   const protectedRoutes = ['/users', '/products'] // Rutas que requieren autenticación
 
@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware((to) => {
     }
   }
 
-  // Opcional: Si el usuario YA está autenticado e intenta acceder a la página de login ('/')
+  // Si el usuario YA está autenticado e intenta acceder a la página de login ('/')
   if (to.path === '/' && isAuthenticated) {
     // Redirigirlo a una página por defecto para usuarios logueados, por ejemplo '/users'
     return navigateTo('/users')

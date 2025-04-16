@@ -6,6 +6,7 @@
         :headers="headers"
         :items="filteredUsers"
         :items-per-page="5"
+        items-per-page-text="Usuarios por página"
         :loading="loading"
         loading-text="Cargando usuarios..."
         class="elevation-1"

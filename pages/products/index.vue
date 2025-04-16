@@ -6,6 +6,7 @@
         :headers="headers"
         :items="filteredProducts"
         :items-per-page="5"
+        items-per-page-text="Productos por página"
         :loading="loading"
         loading-text="Cargando productos..."
         class="elevation-1"
