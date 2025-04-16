@@ -89,7 +89,8 @@ const handleLogin = async () => {
     })
 
     authStore.setToken(response.token)
-    alertStore.showAlert('¡Bienvenido! Has iniciado sesión correctamente', 'success')
+    authStore.setUserName(userName.value)
+    alertStore.showAlert('Has iniciado sesión correctamente', 'success')
     router.push('/users')
   } catch (error) {
     console.error('Error en el login:', error)

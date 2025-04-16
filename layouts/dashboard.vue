@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
@@ -143,11 +143,15 @@ const authStore = useAuthStore()
 const alertStore = useAlertStore()
 const searchStore = useSearchStore()
 const router = useRouter()
-const userName = ref('Usuario')
 const drawer = ref(false)
 const themeStore = useThemeStore()
 
 const { mdAndUp } = useDisplay()
+
+// Usar el userName del estado de autenticación
+const userName = computed(() => {
+  return authStore.userName || 'Usuario'
+})
 
 interface ThemeOption {
   name: string;
