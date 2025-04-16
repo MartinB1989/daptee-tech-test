@@ -38,68 +38,65 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useFakeStore } from '~/composables/useFakeStore'
+import { useAlertStore } from '~/stores/alert'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 interface User {
-  name: string
-  userName: string
-  phone: string
+  id: number
   email: string
+  username: string
+  password: string
+  name: {
+    firstname: string
+    lastname: string
+  }
+  phone: string
+  address: {
+    geolocation: {
+      lat: string
+      long: string
+    }
+    city: string
+    street: string
+    number: number
+    zipcode: string
+  }
 }
 
 const loading = ref(true)
 const users = ref<User[]>([])
+const fakeStore = useFakeStore()
+const alertStore = useAlertStore()
 
 const headers = [
-  { title: 'Nombre', key: 'name' },
-  { title: 'Usuario', key: 'userName' },
-  { title: 'Teléfono', key: 'phone' },
+  { title: 'Nombre', key: 'name.firstname' },
+  { title: 'Apellido', key: 'name.lastname' },
+  { title: 'Usuario', key: 'username' },
   { title: 'Email', key: 'email' },
+  { title: 'Teléfono', key: 'phone' },
+  { title: 'Ciudad', key: 'address.city' },
   { title: 'Acciones', key: 'actions', sortable: false }
 ]
 
-const mockUsers: User[] = [
-  {
-    name: 'Juan Pérez',
-    userName: 'jperez',
-    phone: '555-1234',
-    email: 'juan.perez@example.com'
-  },
-  {
-    name: 'María García',
-    userName: 'mgarcia',
-    phone: '555-5678',
-    email: 'maria.garcia@example.com'
-  },
-  {
-    name: 'Carlos López',
-    userName: 'clopez',
-    phone: '555-9012',
-    email: 'carlos.lopez@example.com'
-  },
-  {
-    name: 'Ana Martínez',
-    userName: 'amartinez',
-    phone: '555-3456',
-    email: 'ana.martinez@example.com'
-  },
-  {
-    name: 'Pedro Sánchez',
-    userName: 'psanchez',
-    phone: '555-7890',
-    email: 'pedro.sanchez@example.com'
-  }
-]
-
-const fetchUsers = () => {
+const fetchUsers = async () => {
   loading.value = true
-  setTimeout(() => {
-    users.value = mockUsers
+  try {
+    users.value = await fakeStore.getUsers()
+  } catch (error) {
+    console.error('Error al cargar usuarios:', error)
+    alertStore.showAlert(
+      'Error al cargar los usuarios. Por favor, intente nuevamente más tarde.',
+      'error',
+      5000,
+      'right bottom'
+    )
+  } finally {
     loading.value = false
-  }, 1500)
+  }
 }
 
 onMounted(() => {

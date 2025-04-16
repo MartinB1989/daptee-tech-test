@@ -7,6 +7,28 @@ interface LoginResponse {
   token: string
 }
 
+interface User {
+  id: number
+  email: string
+  username: string
+  password: string
+  name: {
+    firstname: string
+    lastname: string
+  }
+  phone: string
+  address: {
+    geolocation: {
+      lat: string
+      long: string
+    }
+    city: string
+    street: string
+    number: number
+    zipcode: string
+  }
+}
+
 export const useFakeStore = () => {
   const config = useRuntimeConfig()
   const baseUrl = config.public.apiBase
@@ -21,7 +43,12 @@ export const useFakeStore = () => {
     })
   }
 
+  const getUsers = () => {
+    return $fetch<User[]>(`${baseUrl}/users`)
+  }
+
   return {
-    login
+    login,
+    getUsers
   }
 } 
