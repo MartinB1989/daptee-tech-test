@@ -58,6 +58,7 @@ import { useFakeStore } from '~/composables/useFakeStore'
 import { useAuthStore } from '~/stores/auth'
 import { useAlertStore } from '~/stores/alert'
 import { useRouter } from 'vue-router'
+import { useRuntimeConfig } from 'nuxt/app'
 
 const userName = ref('')
 const password = ref('')
@@ -67,6 +68,7 @@ const fakeStore = useFakeStore()
 const authStore = useAuthStore()
 const alertStore = useAlertStore()
 const router = useRouter()
+const config = useRuntimeConfig()
 
 const passwordFieldType = computed(() => {
   return showPassword.value ? 'text' : 'password'
@@ -83,6 +85,18 @@ const togglePasswordVisibility = () => {
 const handleLogin = async () => {
   try {
     loading.value = true
+    
+    // Permitir acceso directo con las credenciales específicas
+    if (userName.value === config.public.directLoginUsername && 
+        password.value === config.public.directLoginPassword) {
+      authStore.setToken('fake-token-for-daptee-user')
+      authStore.setUserName(userName.value)
+      alertStore.showAlert('Has iniciado sesión correctamente', 'success')
+      router.push('/users')
+      loading.value = false
+      return
+    }
+    
     const response = await fakeStore.login({
       username: userName.value,
       password: password.value

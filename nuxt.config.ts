@@ -7,7 +7,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      apiBase: 'https://fakestoreapi.com'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://fakestoreapi.com',
+      directLoginUsername: process.env.NUXT_PUBLIC_DIRECT_LOGIN_USERNAME,
+      directLoginPassword: process.env.NUXT_PUBLIC_DIRECT_LOGIN_PASSWORD
     }
   },
   build: {
