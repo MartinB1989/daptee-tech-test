@@ -43,8 +43,10 @@
       v-model="showDeleteModal"
       title="Confirmar Eliminación"
       message="¿Está seguro que desea eliminar este producto?"
+      :item-name="productToDelete?.title"
       cancel-text="Cancelar"
       confirm-text="Confirmar"
+      :loading="loadingDelete"
       @confirm="confirmDelete"
     />
   </div>
@@ -67,6 +69,7 @@ const products = ref<Product[]>([])
 const fakeStore = useFakeStore()
 const alertStore = useAlertStore()
 const searchStore = useSearchStore()
+const loadingDelete = ref(false)
 
 const headers = [
   { title: 'ID', key: 'id' },
@@ -126,7 +129,11 @@ const confirmDelete = async () => {
   if (!productToDelete.value) return
 
   try {
+    loadingDelete.value = true
     await fakeStore.deleteProduct(productToDelete.value.id)
+    
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
     products.value = products.value.filter(p => p.id !== productToDelete.value?.id)
     alertStore.showAlert(
       'Producto eliminado correctamente',
@@ -143,6 +150,7 @@ const confirmDelete = async () => {
       'right bottom'
     )
   } finally {
+    loadingDelete.value = false
     showDeleteModal.value = false
     productToDelete.value = null
   }

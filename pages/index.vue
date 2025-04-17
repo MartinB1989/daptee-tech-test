@@ -6,13 +6,16 @@
         <v-card class="w-100" max-width="400" elevation="0">
           <v-card-title class="text-h4 font-weight-bold mb-6">Bienvenido</v-card-title>
           <v-card-text>
-            <v-form @submit.prevent="handleLogin">
+            <v-form :disabled="loading" @submit.prevent="handleLogin">
               <v-text-field
                 v-model="userName"
                 label="Nombre de usuario"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
                 class="mb-4"
+                :error-messages="errors.userName"
+                :disabled="loading"
+                @input="errors.userName = ''"
               />
               <v-text-field
                 v-model="password"
@@ -22,6 +25,9 @@
                 :type="passwordFieldType"
                 :append-inner-icon="passwordIcon"
                 class="mb-4"
+                :error-messages="errors.password"
+                :disabled="loading"
+                @input="errors.password = ''"
                 @click:append-inner="togglePasswordVisibility"
               />
               <v-btn
@@ -31,7 +37,6 @@
                 type="submit"
                 class="mt-4"
                 :loading="loading"
-                :disabled="loading"
               >
                 Iniciar sesión
               </v-btn>
@@ -82,7 +87,23 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
 }
 
+const errors = ref({
+  userName: '',
+  password: ''
+})
+
 const handleLogin = async () => {
+  // Validación básica
+  if (!userName.value) {
+    errors.value.userName = 'El nombre de usuario es obligatorio'
+    return
+  }
+  
+  if (!password.value) {
+    errors.value.password = 'La contraseña es obligatoria'
+    return
+  }
+  
   try {
     loading.value = true
     

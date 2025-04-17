@@ -11,6 +11,25 @@
         loading-text="Cargando usuarios..."
         class="elevation-1"
       >
+        <template #loading>
+          <v-skeleton-loader
+            type="table-row-divider"
+            :loading="loading"
+            :types="{ 'table-row-divider': 'table-heading, table-row@5' }"
+          />
+        </template>
+        
+        <template #no-data>
+          <div class="d-flex flex-column align-center py-6">
+            <v-icon size="64" color="grey lighten-1" class="mb-4">mdi-account-off</v-icon>
+            <h3 class="text-subtitle-1 text-center">No hay usuarios disponibles</h3>
+            <v-btn color="primary" class="mt-4" @click="fetchUsers">
+              <v-icon left>mdi-refresh</v-icon>
+              Reintentar
+            </v-btn>
+          </div>
+        </template>
+
         <template #[`item.actions`]="{ item }">
           <v-menu>
             <template #activator="{ props }">
@@ -43,8 +62,10 @@
       v-model="showDeleteModal"
       title="Confirmar Eliminación"
       message="¿Está seguro que desea eliminar este usuario?"
+      :item-name="userToDelete?.username"
       cancel-text="Cancelar"
       confirm-text="Confirmar"
+      :loading="loadingDelete"
       @confirm="confirmDelete"
     />
   </div>
@@ -67,6 +88,7 @@ const users = ref<User[]>([])
 const fakeStore = useFakeStore()
 const alertStore = useAlertStore()
 const searchStore = useSearchStore()
+const loadingDelete = ref(false)
 
 const headers = [
   { title: 'Nombre', key: 'name.firstname' },
@@ -126,10 +148,17 @@ const deleteUser = (user: User) => {
 
 const confirmDelete = async () => {
   if (!userToDelete.value) return
-
+  
   try {
+    loadingDelete.value = true
     await fakeStore.deleteUser(userToDelete.value.id)
+    
+    // Añadir una pequeña demora para mejor feedback visual
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    // Actualizar la interfaz
     users.value = users.value.filter(u => u.id !== userToDelete.value?.id)
+    
     alertStore.showAlert(
       'Usuario eliminado correctamente',
       'success',
@@ -145,6 +174,7 @@ const confirmDelete = async () => {
       'right bottom'
     )
   } finally {
+    loadingDelete.value = false
     showDeleteModal.value = false
     userToDelete.value = null
   }

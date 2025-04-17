@@ -1,5 +1,14 @@
 <template>
   <v-app>
+    <!-- Barra de progreso de navegación -->
+    <v-progress-linear
+      v-if="isNavigating"
+      color="primary"
+      indeterminate
+      position="absolute"
+      style="z-index: 1200"
+    />
+
     <v-navigation-drawer
       v-model="drawer"
       :rail="!mdAndUp"
@@ -115,18 +124,31 @@
       </v-container>
     </v-main>
 
-    <v-alert
+    <!-- Mejorar el sistema de alertas con animaciones y más detalles -->
+    <v-snackbar
       v-model="alertStore.show"
-      :type="alertStore.type"
+      :color="alertStore.type"
       :timeout="alertStore.timeout"
       :location="alertStore.location"
-      position="absolute"
-      class="ma-4"
-      closable
-      @update:model-value="alertStore.hideAlert"
+      transition="slide-y-transition"
+      max-width="400"
     >
-      {{ alertStore.message }}
-    </v-alert>
+      <div class="d-flex align-center">
+        <v-icon 
+          class="mr-3" 
+          :icon="getAlertIcon(alertStore.type)"
+        />
+        <span>{{ alertStore.message }}</span>
+      </div>
+      
+      <template #actions>
+        <v-btn
+          variant="text"
+          icon="mdi-close"
+          @click="alertStore.hideAlert"
+        />
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -205,6 +227,33 @@ const handleUserMenuClick = (action: string) => {
       break
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getAlertIcon = (type: any) => {
+  switch (type) {
+    case 'success': return 'mdi-check-circle';
+    case 'error': return 'mdi-alert-circle';
+    case 'warning': return 'mdi-alert';
+    case 'info': 
+    default: return 'mdi-information';
+  }
+}
+
+const isNavigating = ref(false)
+
+// Detectar navegación
+onMounted(() => {
+  router.beforeEach(() => {
+    isNavigating.value = true
+    return true
+  })
+  
+  router.afterEach(() => {
+    setTimeout(() => {
+      isNavigating.value = false
+    }, 200)
+  })
+})
 </script>
 
 <style scoped>
