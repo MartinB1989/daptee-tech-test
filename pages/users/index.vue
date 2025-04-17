@@ -55,6 +55,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
+import { filterItemsBySearchTerm } from '~/utils/filter'
 import type { User } from '~/types/User'
 
 definePageMeta({
@@ -84,19 +85,11 @@ const userToDelete = ref<User | null>(null)
 
 // Filtrar usuarios según el término de búsqueda
 const filteredUsers = computed(() => {
-  if (!searchStore.searchQuery) {
-    return users.value
-  }
-
-  const searchTerm = searchStore.searchQuery.toLowerCase()
-  return users.value.filter(user => {
-    return (
-      user.username.toLowerCase().includes(searchTerm) || 
-      user.email.toLowerCase().includes(searchTerm) || 
-      user.name.firstname.toLowerCase().includes(searchTerm) || 
-      user.name.lastname.toLowerCase().includes(searchTerm)
-    )
-  })
+  return filterItemsBySearchTerm(
+    users.value,
+    searchStore.searchQuery || '',
+    ['username', 'email', 'name.firstname', 'name.lastname']
+  )
 })
 
 // Limpiar búsqueda al desmontar el componente

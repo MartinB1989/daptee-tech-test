@@ -55,6 +55,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useFakeStore } from '~/composables/useFakeStore'
 import { useAlertStore } from '~/stores/alert'
 import { useSearchStore } from '~/stores/search'
+import { filterItemsBySearchTerm } from '~/utils/filter'
 import type { Product } from '~/types/Product'
 
 definePageMeta({
@@ -83,13 +84,10 @@ const productToDelete = ref<Product | null>(null)
 
 // Filtrar productos según el término de búsqueda
 const filteredProducts = computed(() => {
-  if (!searchStore.searchQuery) {
-    return products.value
-  }
-
-  const searchTerm = searchStore.searchQuery.toLowerCase()
-  return products.value.filter(product => 
-    product.title.toLowerCase().includes(searchTerm)
+  return filterItemsBySearchTerm(
+    products.value,
+    searchStore.searchQuery || '',
+    ['title', 'category']
   )
 })
 
